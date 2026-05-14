@@ -13,7 +13,7 @@
 			<!-- Navigation Links -->
 			<div class="flex items-center gap-8">
 				<a
-					href="./"
+					href="/"
 					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname === './'
 						? 'text-white border-b-2 border-blue-500'
 						: ''}"
@@ -21,7 +21,7 @@
 					Home
 				</a>
 				<a
-					href="./tools"
+					href="/tools"
 					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname.startsWith(
 						'/tools'
 					)
@@ -31,7 +31,7 @@
 					Tools
 				</a>
 				<a
-					href="./learn"
+					href="/learn"
 					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname.startsWith(
 						'/learn'
 					)
@@ -41,7 +41,7 @@
 					Learn
 				</a>
 				<a
-					href="./games"
+					href="/games"
 					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname.startsWith(
 						'/games'
 					)
