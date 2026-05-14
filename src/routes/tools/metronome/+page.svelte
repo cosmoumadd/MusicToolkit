@@ -100,7 +100,7 @@
 						state.isPlaying
 							? 'bg-blue-500 border-blue-400 scale-110'
 							: 'bg-slate-700 border-slate-600'}"
-					/>
+					></div>
 				{/each}
 			</div>
 
@@ -111,7 +111,7 @@
 					min="40"
 					max="300"
 					value={state.bpm}
-					on:input={handleBpmChange}
+					oninput={handleBpmChange}
 					class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
 				/>
 				<div class="flex justify-between text-xs text-slate-500 mt-2 px-1">
@@ -123,7 +123,7 @@
 			<!-- Play/Pause & Reset Buttons -->
 			<div class="flex gap-4 mb-6">
 				<button
-					on:click={handlePlayPause}
+					onclick={handlePlayPause}
 					class="flex-1 py-4 px-6 rounded-lg font-bold text-lg transition-all duration-200 {state.isPlaying
 						? 'bg-red-600 hover:bg-red-700 text-white'
 						: 'bg-blue-600 hover:bg-blue-700 text-white'}"
@@ -131,7 +131,7 @@
 					{state.isPlaying ? '⏸ Stop' : '▶ Start'}
 				</button>
 				<button
-					on:click={handleReset}
+					onclick={handleReset}
 					class="py-4 px-6 rounded-lg font-semibold bg-slate-700 hover:bg-slate-600 text-white transition-all"
 				>
 					Reset
@@ -147,7 +147,7 @@
 				<div class="flex gap-2">
 					{#each [2, 3, 4, 5, 6] as beats}
 						<button
-							on:click={() => handleTimeSignatureChange(beats)}
+							onclick={() => handleTimeSignatureChange(beats)}
 							class="flex-1 py-2 px-3 rounded font-semibold text-sm transition-all {state
 								.timeSignature.beats === beats
 								? 'bg-blue-600 text-white'
@@ -183,7 +183,7 @@
 			<!-- Accent Settings -->
 			<div class="md:col-span-2 bg-slate-800 rounded-lg p-6 border border-slate-700">
 				<button
-					on:click={handleAccentToggle}
+					onclick={handleAccentToggle}
 					class="w-full py-3 px-4 rounded-lg font-semibold transition-all {state.accentEnabled
 						? 'bg-green-600 hover:bg-green-700 text-white'
 						: 'bg-slate-700 hover:bg-slate-600 text-slate-300'}"
