@@ -8,13 +8,13 @@
 			</p>
 			<div class="flex gap-4 justify-center flex-wrap">
 				<a
-					href="/tools"
+					href="./tools"
 					class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
 				>
 					Explore Tools
 				</a>
 				<a
-					href="/learn"
+					href="./learn"
 					class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors"
 				>
 					Start Learning
@@ -31,7 +31,7 @@
 				<p class="text-slate-400 text-sm mb-4">
 					Essential music tools including metronome, chord detector, scale finder, and interval trainer.
 				</p>
-				<a href="/tools" class="text-blue-400 hover:text-blue-300 font-semibold text-sm">
+				<a href="./tools" class="text-blue-400 hover:text-blue-300 font-semibold text-sm">
 					Explore →
 				</a>
 			</div>
@@ -43,7 +43,7 @@
 				<p class="text-slate-400 text-sm mb-4">
 					Deep dive into music theory with comprehensive guides on chords, scales, intervals, and rhythm.
 				</p>
-				<a href="/learn" class="text-green-400 hover:text-green-300 font-semibold text-sm">
+				<a href="./learn" class="text-green-400 hover:text-green-300 font-semibold text-sm">
 					Start Learning →
 				</a>
 			</div>
@@ -55,7 +55,7 @@
 				<p class="text-slate-400 text-sm mb-4">
 					Gamified ear training exercises: guess chords, identify intervals, and master rhythm patterns.
 				</p>
-				<a href="/games" class="text-purple-400 hover:text-purple-300 font-semibold text-sm">
+				<a href="./games" class="text-purple-400 hover:text-purple-300 font-semibold text-sm">
 					Play Games →
 				</a>
 			</div>
@@ -65,16 +65,16 @@
 		<div class="bg-slate-800 rounded-lg p-6 border border-slate-700 mb-16">
 			<h2 class="text-xl font-bold text-white mb-4">Quick Access</h2>
 			<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-				<a href="/tools/metronome" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-semibold transition-colors text-center">
+				<a href="./tools/metronome" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-semibold transition-colors text-center">
 					⏱️ Metronome
 				</a>
-				<a href="/tools/chord-detector" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-semibold transition-colors text-center">
+				<a href="./tools/chord-detector" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-semibold transition-colors text-center">
 					🎸 Chords
 				</a>
-				<a href="/tools/scale-finder" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-semibold transition-colors text-center">
+				<a href="./tools/scale-finder" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-semibold transition-colors text-center">
 					🎹 Scales
 				</a>
-				<a href="/tools/interval-trainer" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-semibold transition-colors text-center">
+				<a href="./tools/interval-trainer" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-semibold transition-colors text-center">
 					🎵 Intervals
 				</a>
 			</div>

@@ -8,9 +8,9 @@ const config = {
       base: process.env.NODE_ENV === 'production' ? '/MusicToolkit' : '',
     },
     prerender: {
-      handleHttpError: ({ path, referrer, message }) => {
-        if (path === '/') {
-          return;
+      handleHttpError: ({ path, referrer, message }) => {開頭，一律忽略
+        if (process.env.NODE_ENV === 'production' && !path.startsWith('/MusicToolkit')) {
+          return; 
         }
         throw new Error(message);
       }

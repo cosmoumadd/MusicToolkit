@@ -23,7 +23,7 @@
 				<a
 					href="./tools"
 					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname.startsWith(
-						'/tools'
+						'./tools'
 					)
 						? 'text-white border-b-2 border-blue-500'
 						: ''}"
@@ -33,7 +33,7 @@
 				<a
 					href="./learn"
 					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname.startsWith(
-						'/learn'
+						'./learn'
 					)
 						? 'text-white border-b-2 border-blue-500'
 						: ''}"
@@ -43,7 +43,7 @@
 				<a
 					href="./games"
 					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname.startsWith(
-						'/games'
+						'./games'
 					)
 						? 'text-white border-b-2 border-blue-500'
 						: ''}"

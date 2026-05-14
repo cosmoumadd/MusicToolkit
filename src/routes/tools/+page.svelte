@@ -15,7 +15,7 @@
 			</a>
 
 			<a
-				href="/tools/chord-detector"
+				href="./tools/chord-detector"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-blue-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">🎯 Chord Detector</h2>
@@ -23,7 +23,7 @@
 			</a>
 
 			<a
-				href="/tools/scale-finder"
+				href="./tools/scale-finder"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-blue-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">🎼 Scale Finder</h2>
@@ -31,7 +31,7 @@
 			</a>
 
 			<a
-				href="/tools/interval-trainer"
+				href="./tools/interval-trainer"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-blue-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">📊 Interval Trainer</h2>
