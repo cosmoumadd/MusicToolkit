@@ -1,3 +1,7 @@
+<script lang="ts">
+    import { base } from '$app/paths'; // use base path for correct linking in production
+</script>
+
 <div class="min-h-[calc(100vh-180px)] bg-gradient-to-b from-slate-950 to-slate-900 py-12 px-6">
 	<div class="max-w-6xl mx-auto">
 		<h1 class="text-4xl font-bold text-white mb-4">🎮 Games</h1>
@@ -7,7 +11,7 @@
 
 		<div class="grid md:grid-cols-2 gap-6">
 			<a
-				href="./games/guess-chord"
+				href="{base}/games/guess-chord"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-purple-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">🎯 Guess the Chord</h2>
@@ -15,7 +19,7 @@
 			</a>
 
 			<a
-				href="./games/ear-training"
+				href="{base}/games/ear-training"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-purple-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">👂 Ear Training</h2>
@@ -23,7 +27,7 @@
 			</a>
 
 			<a
-				href="./games/rhythm-game"
+				href="{base}/games/rhythm-game"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-purple-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">🥁 Rhythm Game</h2>
