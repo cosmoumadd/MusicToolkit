@@ -170,7 +170,7 @@
 						max="1"
 						step="0.1"
 						value={state.volume}
-						on:input={handleVolumeChange}
+						oninput={handleVolumeChange}
 						class="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-green-500"
 					/>
 					<span class="text-sm text-slate-400">🔊</span>
