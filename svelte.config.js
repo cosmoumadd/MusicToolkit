@@ -8,6 +8,9 @@ const config = {
       base: process.env.NODE_ENV === 'production' ? '/MusicToolkit' : '',
     },
     prerender: {
+      // fix 1: tell the crawler to ignore missing id for anchors (like #/) instead of throwing an error
+      handleMissingId: 'ignore',
+
       // ignore missing routes during prerendering, but only for the expected ones
       handleHttpError: ({ path, referrer, message }) => {
         // this function will be called whenever a route is missing during prerendering
@@ -23,8 +26,13 @@ const config = {
           '/MusicToolkit/learn/intervals'
         ];
 
-        // if the missing route is one of the expected ones, just ignore the error and continue
-        if (missingRoutes.includes(path) || path === '/') {
+        // fix 2: ignore missing routes that are expected due to the way we handle routing in SvelteKit (like the ones with # or the base path)
+        if (
+          missingRoutes.includes(path) || 
+          path === '/' || 
+          path === '/MusicToolkit/' || 
+          path.includes('#')
+        ) {
           return;
         }
 
