@@ -1,18 +1,21 @@
 import adapter from '@sveltejs/adapter-static';
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
-const dev = process.argv.includes('dev');
-
+/** @type {import('@sveltejs/kit').Config} */
 const config = {
-	preprocess: vitePreprocess(),
-
-	kit: {
-		adapter: adapter(),
-
-		paths: {
-			base: dev ? '' : '/MusicToolkit'
-		}
-	}
+  kit: {
+    adapter: adapter(),
+    paths: {
+      base: process.env.NODE_ENV === 'production' ? '/MusicToolkit' : '',
+    },
+    prerender: {
+      handleHttpError: ({ path, referrer, message }) => {
+        if (path === '/') {
+          return;
+        }
+        throw new Error(message);
+      }
+    }
+  }
 };
 
 export default config;
