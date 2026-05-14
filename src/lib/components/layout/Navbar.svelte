@@ -6,22 +6,22 @@
 	<div class="max-w-6xl mx-auto px-6 py-4">
 		<div class="flex items-center justify-between">
 			<!-- Logo/Brand -->
-			<a href="/" class="flex items-center gap-2 hover:text-blue-400 transition-colors">
+			<a href="./" class="flex items-center gap-2 hover:text-blue-400 transition-colors">
 				<span class="text-xl font-bold text-white">🎵 MusicToolkit</span>
 			</a>
 
 			<!-- Navigation Links -->
 			<div class="flex items-center gap-8">
 				<a
-					href="/"
-					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname === '/'
+					href="./"
+					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname === './'
 						? 'text-white border-b-2 border-blue-500'
 						: ''}"
 				>
 					Home
 				</a>
 				<a
-					href="/tools"
+					href="./tools"
 					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname.startsWith(
 						'/tools'
 					)
@@ -31,7 +31,7 @@
 					Tools
 				</a>
 				<a
-					href="/learn"
+					href="./learn"
 					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname.startsWith(
 						'/learn'
 					)
@@ -41,7 +41,7 @@
 					Learn
 				</a>
 				<a
-					href="/games"
+					href="./games"
 					class="text-slate-400 hover:text-white transition-colors {$page.url.pathname.startsWith(
 						'/games'
 					)
