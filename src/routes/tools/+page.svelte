@@ -7,7 +7,7 @@
 
 		<div class="grid md:grid-cols-2 gap-6">
 			<a
-				href="/tools/metronome"
+				href="./tools/metronome"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-blue-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">⏱️ Metronome</h2>

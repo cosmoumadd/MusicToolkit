@@ -7,7 +7,7 @@
 
 		<div class="grid md:grid-cols-2 gap-6">
 			<a
-				href="/games/guess-chord"
+				href="./games/guess-chord"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-purple-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">🎯 Guess the Chord</h2>
@@ -15,7 +15,7 @@
 			</a>
 
 			<a
-				href="/games/ear-training"
+				href="./games/ear-training"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-purple-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">👂 Ear Training</h2>
@@ -23,7 +23,7 @@
 			</a>
 
 			<a
-				href="/games/rhythm-game"
+				href="./games/rhythm-game"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-purple-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">🥁 Rhythm Game</h2>

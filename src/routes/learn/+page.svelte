@@ -7,7 +7,7 @@
 
 		<div class="grid md:grid-cols-2 gap-6">
 			<a
-				href="/learn/chords"
+				href="./learn/chords"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-green-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">🎸 Chords</h2>
@@ -15,7 +15,7 @@
 			</a>
 
 			<a
-				href="/learn/scales"
+				href="./learn/scales"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-green-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">🎵 Scales</h2>
@@ -23,7 +23,7 @@
 			</a>
 
 			<a
-				href="/learn/intervals"
+				href="./learn/intervals"
 				class="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-green-500 hover:bg-slate-750 transition-all"
 			>
 				<h2 class="text-2xl font-bold text-white mb-2">🎼 Intervals</h2>
