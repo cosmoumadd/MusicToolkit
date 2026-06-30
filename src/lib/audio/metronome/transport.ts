@@ -68,6 +68,13 @@ export class MetronomeTransport {
 	}
 
 	/**
+	 * Schedule a callback on a musical interval so live BPM changes stay in sync.
+	 */
+	scheduleRepeat(callback: (time: number) => void, interval: string): number {
+		return Tone.Transport.scheduleRepeat(callback, interval);
+	}
+
+	/**
 	 * Clear a scheduled event
 	 */
 	clearSchedule(id: number): void {

@@ -1,237 +1,170 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { metronomeStore } from '$lib/stores/metronome';
 	import MetronomeEngine from '$lib/audio/metronome/engine';
+	import BeatIndicator from '$lib/components/metronome/BeatIndicator.svelte';
+	import TempoControl from '$lib/components/metronome/TempoControl.svelte';
 
 	let state = $derived($metronomeStore);
 	let engine: MetronomeEngine;
+	let tapTimes: number[] = [];
+
+	const tempoName = (bpm: number) => {
+		if (bpm < 60) return 'Largo';
+		if (bpm < 76) return 'Adagio';
+		if (bpm < 108) return 'Andante';
+		if (bpm < 120) return 'Moderato';
+		if (bpm < 168) return 'Allegro';
+		return 'Presto';
+	};
 
 	onMount(() => {
 		engine = new MetronomeEngine();
 	});
 
-	onDestroy(() => {
-		if (engine) {
-			engine.dispose();
-		}
-	});
+	onDestroy(() => engine?.dispose());
 
 	const handlePlayPause = async () => {
-		if (engine) {
-			if (state.isPlaying) {
-				// Update store immediately for instant feedback
-				metronomeStore.setPlaying(false);
-				engine.stop();
-			} else {
-				// Update store immediately for instant feedback
-				metronomeStore.setPlaying(true);
-				try {
-					await engine.start();
-				} catch (error) {
-					console.error('Failed to start metronome:', error);
-					// Revert store on error
-					metronomeStore.setPlaying(false);
-				}
-			}
+		try {
+			await engine?.toggle();
+		} catch (error) {
+			console.error('Failed to start metronome:', error);
+			metronomeStore.setPlaying(false);
 		}
 	};
 
-	const handleBpmChange = (e: Event) => {
-		const target = e.target as HTMLInputElement;
-		const bpm = parseInt(target.value, 10);
-		metronomeStore.setBpm(bpm);
-		if (engine) {
-			engine.setBpm(bpm);
-		}
+	const handleBpmChange = (bpm: number) => engine?.setBpm(bpm);
+
+	const handleTap = () => {
+		const now = performance.now();
+		if (tapTimes.length && now - tapTimes.at(-1)! > 2000) tapTimes = [];
+		tapTimes = [...tapTimes.slice(-4), now];
+		if (tapTimes.length < 2) return;
+
+		const intervals = tapTimes.slice(1).map((time, index) => time - tapTimes[index]);
+		const average = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+		handleBpmChange(Math.round(60000 / average));
 	};
 
-	const handleTimeSignatureChange = (beats: number) => {
-		metronomeStore.setTimeSignature(beats, 4);
-		if (engine) {
-			engine.setTimeSignature(beats, 4);
-		}
-	};
-
-	const handleVolumeChange = (e: Event) => {
-		const target = e.target as HTMLInputElement;
-		const volume = parseFloat(target.value);
-		metronomeStore.setVolume(volume);
-		if (engine) {
-			engine.setVolume(volume);
-		}
-	};
-
-	const handleAccentToggle = () => {
-		metronomeStore.toggleAccent();
-		if (engine) {
-			engine.toggleAccent();
-		}
-	};
-
-	const handleReset = () => {
-		if (engine && state.isPlaying) {
-			engine.stop();
-		}
-		metronomeStore.reset();
+	const handleKeyboard = (event: KeyboardEvent) => {
+		const target = event.target as HTMLElement;
+		if (event.code !== 'Space' || ['INPUT', 'BUTTON', 'TEXTAREA'].includes(target.tagName)) return;
+		event.preventDefault();
+		handlePlayPause();
 	};
 </script>
 
-<div class="min-h-[calc(100vh-180px)] bg-gradient-to-b from-slate-950 to-slate-900 py-12 px-6">
-	<div class="max-w-2xl mx-auto">
-		<!-- Header -->
-		<div class="mb-8">
-			<h1 class="text-4xl font-bold text-white mb-2">⏱️ Metronome</h1>
-			<p class="text-slate-400">Keep your timing perfect with an interactive metronome.</p>
-		</div>
+<svelte:window onkeydown={handleKeyboard} />
 
-		<!-- Main Display Card -->
-		<div class="bg-slate-800 rounded-lg p-8 border border-slate-700 mb-6 shadow-xl">
-			<!-- BPM Display -->
-			<div class="text-center mb-8">
-				<div class="text-7xl font-bold text-blue-400 font-mono">{state.bpm}</div>
-				<div class="text-slate-400 text-lg mt-2">Beats Per Minute</div>
+<svelte:head>
+	<title>Online Metronome | Music Toolkit</title>
+	<meta
+		name="description"
+		content="A precise online metronome with live BPM control, time signatures, accents and tap tempo."
+	/>
+</svelte:head>
+
+<div
+	class="min-h-[calc(100vh-180px)] bg-gradient-to-b from-slate-950 to-slate-900 px-4 py-12 sm:px-6"
+>
+	<div class="mx-auto max-w-3xl">
+		<header class="mb-8 text-center">
+			<p class="mb-2 text-sm font-semibold tracking-[0.25em] text-cyan-400 uppercase">
+				Practice with precision
+			</p>
+			<h1 class="mb-3 text-4xl font-bold text-white sm:text-5xl">🥁 Find Your Pulse</h1>
+			<p class="text-slate-400">
+				A focused online metronome that keeps every practice session in time.
+			</p>
+		</header>
+
+		<section class="mb-6 rounded-2xl border border-slate-700 bg-slate-800 p-5 shadow-2xl sm:p-8">
+			<div class="mb-2 text-center text-sm font-semibold tracking-wider text-cyan-400 uppercase">
+				{tempoName(state.bpm)} · {state.bpm} BPM
 			</div>
 
-			<!-- Beat Indicator -->
-			<div class="flex justify-center gap-2 mb-8">
-				{#each Array(state.timeSignature.beats) as _, i}
-					<div
-						class="w-12 h-12 rounded-full border-2 transition-all {state.currentBeat === i &&
-						state.isPlaying
-							? 'bg-blue-500 border-blue-400 scale-110'
-							: 'bg-slate-700 border-slate-600'}"
-					></div>
-				{/each}
-			</div>
-
-			<!-- BPM Slider -->
-			<div class="mb-8">
-				<input
-					type="range"
-					min="40"
-					max="300"
-					value={state.bpm}
-					oninput={handleBpmChange}
-					class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+			<div class="my-8">
+				<BeatIndicator
+					beats={state.timeSignature.beats}
+					currentBeat={state.currentBeat}
+					isPlaying={state.isPlaying}
 				/>
-				<div class="flex justify-between text-xs text-slate-500 mt-2 px-1">
-					<span>40</span>
-					<span>300</span>
-				</div>
 			</div>
 
-			<!-- Play/Pause & Reset Buttons -->
-			<div class="flex gap-4 mb-6">
+			<TempoControl bpm={state.bpm} onChange={handleBpmChange} onTap={handleTap} />
+
+			<div class="mt-6 flex gap-3">
 				<button
 					onclick={handlePlayPause}
-					class="flex-1 py-4 px-6 rounded-lg font-bold text-lg transition-all duration-200 {state.isPlaying
-						? 'bg-red-600 hover:bg-red-700 text-white'
-						: 'bg-blue-600 hover:bg-blue-700 text-white'}"
+					class="flex-1 rounded-xl px-6 py-4 text-lg font-bold text-white transition {state.isPlaying
+						? 'bg-rose-600 hover:bg-rose-500'
+						: 'bg-cyan-600 hover:bg-cyan-500'}"
 				>
-					{state.isPlaying ? '⏸ Stop' : '▶ Start'}
+					{state.isPlaying ? '■ Stop' : '▶ Start'}
 				</button>
 				<button
-					onclick={handleReset}
-					class="py-4 px-6 rounded-lg font-semibold bg-slate-700 hover:bg-slate-600 text-white transition-all"
+					onclick={() => engine?.reset()}
+					class="rounded-xl bg-slate-700 px-6 py-4 font-semibold text-white transition hover:bg-slate-600"
 				>
 					Reset
 				</button>
 			</div>
-		</div>
+			<p class="mt-3 text-center text-xs text-slate-500">Press Space to start or stop</p>
+		</section>
 
-		<!-- Settings Section -->
-		<div class="grid md:grid-cols-2 gap-6 mb-6">
-			<!-- Time Signature -->
-			<div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
-				<h3 class="text-lg font-semibold text-white mb-4">Time Signature</h3>
-				<div class="flex gap-2">
-					{#each [2, 3, 4, 5, 6] as beats}
+		<section class="mb-6 grid gap-6 md:grid-cols-2">
+			<div class="rounded-xl border border-slate-700 bg-slate-800 p-6">
+				<h2 class="mb-4 text-lg font-semibold text-white">Time Signature</h2>
+				<div class="grid grid-cols-5 gap-2">
+					{#each [2, 3, 4, 5, 6] as beats (beats)}
 						<button
-							onclick={() => handleTimeSignatureChange(beats)}
-							class="flex-1 py-2 px-3 rounded font-semibold text-sm transition-all {state
-								.timeSignature.beats === beats
-								? 'bg-blue-600 text-white'
+							onclick={() => engine?.setTimeSignature(beats, 4)}
+							class="rounded-lg px-2 py-2 text-sm font-semibold transition {state.timeSignature
+								.beats === beats
+								? 'bg-cyan-600 text-white'
 								: 'bg-slate-700 text-slate-300 hover:bg-slate-600'}"
 						>
 							{beats}/4
 						</button>
 					{/each}
 				</div>
+				<p class="mt-3 text-xs text-slate-500">
+					Your selection stays set when the metronome stops.
+				</p>
 			</div>
 
-			<!-- Volume Control -->
-			<div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
-				<h3 class="text-lg font-semibold text-white mb-4">Volume</h3>
+			<div class="rounded-xl border border-slate-700 bg-slate-800 p-6">
+				<div class="mb-4 flex items-center justify-between">
+					<h2 class="text-lg font-semibold text-white">Volume</h2>
+					<span class="text-sm text-slate-400">{Math.round(state.volume * 100)}%</span>
+				</div>
 				<div class="flex items-center gap-4">
-					<span class="text-sm text-slate-400">🔇</span>
+					<span aria-hidden="true">🔈</span>
 					<input
 						type="range"
 						min="0"
 						max="1"
-						step="0.1"
+						step="0.05"
 						value={state.volume}
-						oninput={handleVolumeChange}
-						class="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-green-500"
+						oninput={(event) => engine?.setVolume(Number(event.currentTarget.value))}
+						aria-label="Volume"
+						class="h-2 flex-1 cursor-pointer appearance-none rounded-lg bg-slate-700 accent-cyan-400"
 					/>
-					<span class="text-sm text-slate-400">🔊</span>
-				</div>
-				<div class="text-center mt-2 text-sm text-slate-400">
-					{(state.volume * 100).toFixed(0)}%
+					<span aria-hidden="true">🔊</span>
 				</div>
 			</div>
 
-			<!-- Accent Settings -->
-			<div class="md:col-span-2 bg-slate-800 rounded-lg p-6 border border-slate-700">
+			<div class="rounded-xl border border-slate-700 bg-slate-800 p-6 md:col-span-2">
 				<button
-					onclick={handleAccentToggle}
-					class="w-full py-3 px-4 rounded-lg font-semibold transition-all {state.accentEnabled
-						? 'bg-green-600 hover:bg-green-700 text-white'
-						: 'bg-slate-700 hover:bg-slate-600 text-slate-300'}"
+					onclick={() => engine?.toggleAccent()}
+					aria-pressed={state.accentEnabled}
+					class="w-full rounded-lg px-4 py-3 font-semibold transition {state.accentEnabled
+						? 'bg-emerald-600 text-white hover:bg-emerald-500'
+						: 'bg-slate-700 text-slate-300 hover:bg-slate-600'}"
 				>
-					{state.accentEnabled ? '✓ Accent Enabled' : '✗ Accent Disabled'}
+					{state.accentEnabled ? '✓ First-beat accent on' : 'First-beat accent off'}
 				</button>
-				<p class="text-xs text-slate-500 mt-3">
-					{state.accentEnabled
-						? 'First beat sounds higher (accent)'
-						: 'All beats sound the same'}
-				</p>
 			</div>
-		</div>
-
-		<!-- State Info -->
-		<div class="bg-slate-800 rounded-lg p-6 border border-slate-700">
-			<h3 class="text-lg font-semibold text-white mb-4">Current Settings</h3>
-			<div class="space-y-2 text-sm text-slate-400 font-mono">
-				<p class="flex justify-between">
-					<span>BPM</span>
-					<span class="text-blue-400 font-semibold">{state.bpm}</span>
-				</p>
-				<p class="flex justify-between">
-					<span>Time Signature</span>
-					<span class="text-blue-400 font-semibold"
-						>{state.timeSignature.beats}/{state.timeSignature.beatDuration}</span
-					>
-				</p>
-				<p class="flex justify-between">
-					<span>Volume</span>
-					<span class="text-blue-400 font-semibold">{(state.volume * 100).toFixed(0)}%</span>
-				</p>
-				<p class="flex justify-between">
-					<span>Accent</span>
-					<span class="text-blue-400 font-semibold"
-						>{state.accentEnabled ? 'Enabled' : 'Disabled'}</span
-					>
-				</p>
-				<p class="flex justify-between">
-					<span>Status</span>
-					<span class="text-blue-400 font-semibold">{state.isPlaying ? '🔴 Playing' : '⭕ Stopped'}</span>
-				</p>
-			</div>
-		</div>
-
-		<!-- Note -->
-		<div class="mt-8 p-4 bg-slate-800 rounded-lg border border-slate-700 text-center text-sm text-slate-400">
-			<p>🎵 Tone.js audio engine integrated - Ready to play!</p>
-		</div>
+		</section>
 	</div>
 </div>

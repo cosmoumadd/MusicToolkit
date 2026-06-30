@@ -1,12 +1,13 @@
 import { MetronomeTransport } from './transport';
 import { MetronomeClick } from './click';
-import { MetronomeScheduler, type SchedulerConfig } from './scheduler';
+import { MetronomeScheduler } from './scheduler';
 import { metronomeStore } from '$lib/stores/metronome';
+import { get } from 'svelte/store';
 
 /**
  * Unified Metronome Engine
  * Orchestrates Transport + Click + Scheduler with the Svelte Store
- * 
+ *
  * Architecture:
  * - Transport: Manages Tone.js Transport timing
  * - Click: Generates click sounds
@@ -43,29 +44,24 @@ export class MetronomeEngine {
 	async start(): Promise<void> {
 		await this.initialize();
 
-		const state = {
-			bpm: 120,
-			timeSignature: { beats: 4, beatDuration: 4 },
-			accentEnabled: true
-		};
-
-		// Get current state from store
-		metronomeStore.subscribe((s) => {
-			state.bpm = s.bpm;
-			state.timeSignature = s.timeSignature;
-			state.accentEnabled = s.accentEnabled;
-		})();
+		if (get(metronomeStore).isPlaying) return;
+		const state = get(metronomeStore);
 
 		// Create scheduler
-		this.scheduler = new MetronomeScheduler(this.transport, this.click, {
-			bpm: state.bpm,
-			timeSignature: state.timeSignature,
-			accentEnabled: state.accentEnabled
-		});
+		this.scheduler = new MetronomeScheduler(
+			this.transport,
+			this.click,
+			{
+				bpm: state.bpm,
+				timeSignature: state.timeSignature,
+				accentEnabled: state.accentEnabled
+			},
+			(beat) => metronomeStore.setCurrentBeat(beat)
+		);
 
 		this.transport.setBpm(state.bpm);
-		this.transport.start();
 		this.scheduler.start();
+		this.transport.start();
 
 		metronomeStore.setPlaying(true);
 	}
@@ -80,21 +76,16 @@ export class MetronomeEngine {
 		}
 
 		this.transport.stop();
-		metronomeStore.reset();
+		metronomeStore.setPlaying(false);
+		metronomeStore.setCurrentBeat(0);
 	}
 
 	/**
 	 * Toggle play/pause
 	 */
 	async toggle(): Promise<void> {
-		const unsubscribe = metronomeStore.subscribe((state) => {
-			if (state.isPlaying) {
-				this.stop();
-			} else {
-				this.start();
-			}
-		})();
-		unsubscribe();
+		if (get(metronomeStore).isPlaying) this.stop();
+		else await this.start();
 	}
 
 	/**
@@ -130,12 +121,17 @@ export class MetronomeEngine {
 	 */
 	toggleAccent(): void {
 		metronomeStore.toggleAccent();
-		const unsubscribe = metronomeStore.subscribe((state) => {
-			if (this.scheduler) {
-				this.scheduler.updateAccent(state.accentEnabled);
-			}
-		})();
-		unsubscribe();
+		this.scheduler?.updateAccent(get(metronomeStore).accentEnabled);
+	}
+
+	/**
+	 * Restore the defaults. Unlike stop(), this intentionally clears settings.
+	 */
+	reset(): void {
+		this.stop();
+		metronomeStore.reset();
+		this.transport.setBpm(get(metronomeStore).bpm);
+		this.click.setVolume(get(metronomeStore).volume);
 	}
 
 	/**

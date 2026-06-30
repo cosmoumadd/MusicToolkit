@@ -1,4 +1,4 @@
-import { writable, type Writable } from 'svelte/store';
+import { writable, type Readable } from 'svelte/store';
 
 export interface MetronomeState {
 	bpm: number;
@@ -18,14 +18,23 @@ const initialState: MetronomeState = {
 	currentBeat: 0
 };
 
-function createMetronomeStore(): Writable<MetronomeState> {
+export interface MetronomeStore extends Readable<MetronomeState> {
+	setBpm: (bpm: number) => void;
+	setTimeSignature: (beats: number, beatDuration: number) => void;
+	setVolume: (volume: number) => void;
+	toggleAccent: () => void;
+	setPlaying: (isPlaying: boolean) => void;
+	setCurrentBeat: (currentBeat: number) => void;
+	reset: () => void;
+}
+
+function createMetronomeStore(): MetronomeStore {
 	const { subscribe, set, update } = writable<MetronomeState>(initialState);
 
 	return {
 		subscribe,
-		set,
-		update,
-		setBpm: (bpm: number) => update((state) => ({ ...state, bpm: Math.max(40, Math.min(300, bpm)) })),
+		setBpm: (bpm: number) =>
+			update((state) => ({ ...state, bpm: Math.max(40, Math.min(300, bpm)) })),
 		setTimeSignature: (beats: number, beatDuration: number) =>
 			update((state) => ({ ...state, timeSignature: { beats, beatDuration } })),
 		setVolume: (volume: number) =>
@@ -33,7 +42,7 @@ function createMetronomeStore(): Writable<MetronomeState> {
 		toggleAccent: () => update((state) => ({ ...state, accentEnabled: !state.accentEnabled })),
 		setPlaying: (isPlaying: boolean) => update((state) => ({ ...state, isPlaying })),
 		setCurrentBeat: (currentBeat: number) => update((state) => ({ ...state, currentBeat })),
-		reset: () => set(initialState)
+		reset: () => set({ ...initialState, timeSignature: { ...initialState.timeSignature } })
 	};
 }
 

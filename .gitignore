@@ -1,5 +1,12 @@
 node_modules
 
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
 # Output
 .output
 .vercel
@@ -23,7 +30,17 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 # Playwright
 test-results
+playwright-report
+blob-report
+
+# Test coverage
+coverage
+
+# Local agent configuration
+.agents
 /.claude-plugin
 
-#visual-studio-code
+# Editors
 .vscode
+.idea
+*.swp
