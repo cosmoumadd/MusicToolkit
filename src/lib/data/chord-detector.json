@@ -1,0 +1,36 @@
+{
+	"instruments": [
+		{
+			"id": "piano",
+			"name": "Piano",
+			"icon": "🎹",
+			"description": "Two octaves, from C3 to B4"
+		},
+		{
+			"id": "guitar",
+			"name": "Guitar",
+			"icon": "🎸",
+			"description": "Standard tuning, frets 0–12",
+			"strings": ["E4", "B3", "G3", "D3", "A2", "E2"]
+		},
+		{
+			"id": "ukulele",
+			"name": "Ukulele",
+			"icon": "🎶",
+			"description": "Re-entrant tuning, frets 0–12",
+			"strings": ["A4", "E4", "C4", "G4"]
+		}
+	],
+	"roots": ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"],
+	"qualities": [
+		{ "id": "major", "label": "Major", "symbol": "", "intervals": [0, 4, 7] },
+		{ "id": "minor", "label": "Minor", "symbol": "m", "intervals": [0, 3, 7] },
+		{ "id": "7", "label": "Dominant 7", "symbol": "7", "intervals": [0, 4, 7, 10] },
+		{ "id": "maj7", "label": "Major 7", "symbol": "maj7", "intervals": [0, 4, 7, 11] },
+		{ "id": "m7", "label": "Minor 7", "symbol": "m7", "intervals": [0, 3, 7, 10] },
+		{ "id": "dim", "label": "Diminished", "symbol": "dim", "intervals": [0, 3, 6] },
+		{ "id": "aug", "label": "Augmented", "symbol": "aug", "intervals": [0, 4, 8] },
+		{ "id": "sus2", "label": "Suspended 2", "symbol": "sus2", "intervals": [0, 2, 7] },
+		{ "id": "sus4", "label": "Suspended 4", "symbol": "sus4", "intervals": [0, 5, 7] }
+	]
+}

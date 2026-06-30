@@ -1,0 +1,96 @@
+{
+	"roots": ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"],
+	"voices": [
+		{
+			"id": "grand",
+			"name": "Concert Grand",
+			"icon": "🎹",
+			"description": "Warm concert-piano tone"
+		},
+		{
+			"id": "epiano",
+			"name": "Electric Piano",
+			"icon": "🎶",
+			"description": "Soft, bell-like keys"
+		},
+		{
+			"id": "guitar",
+			"name": "Acoustic Guitar",
+			"icon": "🎸",
+			"description": "Short plucked-string tone"
+		},
+		{ "id": "synth", "name": "Bright Synth", "icon": "✨", "description": "Clear electronic lead" }
+	],
+	"playbackStyles": [
+		{ "id": "scale", "name": "Scale", "description": "Ascend from root to octave" },
+		{ "id": "up-down", "name": "Up & Down", "description": "Ascend, then return home" },
+		{ "id": "contrary", "name": "Contrary Motion", "description": "Two voices move apart" },
+		{ "id": "arpeggio", "name": "Arpeggio", "description": "Play the scale's chord tones" }
+	],
+	"scales": [
+		{
+			"id": "major",
+			"name": "Major",
+			"intervals": [0, 2, 4, 5, 7, 9, 11],
+			"mood": "Bright, open and resolved",
+			"description": "The major scale is the foundation of Western harmony. Its pattern of whole and half steps creates the familiar bright sound heard in countless melodies.",
+			"tip": "Listen for the half steps between degrees 3–4 and 7–8. They give the major scale its pull toward home."
+		},
+		{
+			"id": "natural-minor",
+			"name": "Natural Minor",
+			"intervals": [0, 2, 3, 5, 7, 8, 10],
+			"mood": "Reflective, dark and balanced",
+			"description": "Natural minor lowers the 3rd, 6th and 7th degrees of the major scale. The lowered 3rd is the note that most clearly creates its minor character.",
+			"tip": "Compare it with major and focus on degree 3. That single change immediately shifts the emotional color."
+		},
+		{
+			"id": "harmonic-minor",
+			"name": "Harmonic Minor",
+			"intervals": [0, 2, 3, 5, 7, 8, 11],
+			"mood": "Dramatic, tense and exotic",
+			"description": "Harmonic minor raises the 7th degree of natural minor. This creates a strong leading tone back to the root and a distinctive large step between degrees 6 and 7.",
+			"tip": "Hear how the raised 7th wants to resolve upward to the root. That tension is why this minor works so well in harmony."
+		},
+		{
+			"id": "melodic-minor",
+			"name": "Melodic Minor",
+			"intervals": [0, 2, 3, 5, 7, 9, 11],
+			"mood": "Smooth, sophisticated and searching",
+			"description": "Ascending melodic minor keeps the minor 3rd but raises degrees 6 and 7. It smooths the melodic gaps found in harmonic minor while preserving a strong return to the root.",
+			"tip": "This finder uses the ascending form. Classical melodies often use natural minor again when descending."
+		},
+		{
+			"id": "major-pentatonic",
+			"name": "Major Pentatonic",
+			"intervals": [0, 2, 4, 7, 9],
+			"mood": "Clear, uplifting and spacious",
+			"description": "Major pentatonic removes the two most tense notes from the major scale. Its five-note shape is easy to sing and appears across many musical traditions.",
+			"tip": "Because it avoids half steps, almost every note sits comfortably over a major chord."
+		},
+		{
+			"id": "minor-pentatonic",
+			"name": "Minor Pentatonic",
+			"intervals": [0, 3, 5, 7, 10],
+			"mood": "Earthy, direct and expressive",
+			"description": "Minor pentatonic condenses the natural minor sound into five strong notes. It is central to rock, blues, pop and improvisation.",
+			"tip": "Start and end phrases on the root, then lean on the minor 3rd to make the scale's character unmistakable."
+		},
+		{
+			"id": "blues",
+			"name": "Blues",
+			"intervals": [0, 3, 5, 6, 7, 10],
+			"mood": "Soulful, gritty and tense",
+			"description": "The blues scale adds a chromatic flat 5th to minor pentatonic. That passing blue note creates tension that sounds best when it moves to a neighboring note.",
+			"tip": "Do not camp on the blue note at first—slide through it toward degree 4 or 5."
+		},
+		{
+			"id": "dorian",
+			"name": "Dorian",
+			"intervals": [0, 2, 3, 5, 7, 9, 10],
+			"mood": "Minor, hopeful and funky",
+			"description": "Dorian is a minor mode with a raised 6th. That brighter 6th separates it from natural minor and gives it an energetic, forward-moving quality.",
+			"tip": "Emphasize the natural 6th over a minor chord to reveal the Dorian sound."
+		}
+	]
+}
