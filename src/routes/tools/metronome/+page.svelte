@@ -4,6 +4,7 @@
 	import MetronomeEngine from '$lib/audio/metronome/engine';
 	import BeatIndicator from '$lib/components/metronome/BeatIndicator.svelte';
 	import TempoControl from '$lib/components/metronome/TempoControl.svelte';
+	import BackToTools from '$lib/components/tools/BackToTools.svelte';
 
 	let state = $derived($metronomeStore);
 	let engine: MetronomeEngine;
@@ -68,6 +69,7 @@
 	class="min-h-[calc(100vh-180px)] bg-gradient-to-b from-slate-950 to-slate-900 px-4 py-12 sm:px-6"
 >
 	<div class="mx-auto max-w-3xl">
+		<BackToTools />
 		<header class="mb-8 text-center">
 			<p class="mb-2 text-sm font-semibold tracking-[0.25em] text-cyan-400 uppercase">
 				Practice with precision

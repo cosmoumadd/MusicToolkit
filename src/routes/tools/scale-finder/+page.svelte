@@ -1,47 +1,22 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
+	import { slide } from 'svelte/transition';
 	import scaleData from '$lib/data/scales.json';
-	import { belongsToScale, buildScale } from '$lib/music/scale-finder';
+	import PianoKeyboard from '$lib/components/music/PianoKeyboard.svelte';
+	import BackToTools from '$lib/components/tools/BackToTools.svelte';
+	import { buildScale } from '$lib/music/scale-finder';
 	import { createPlaybackEvents, type PlaybackStyle } from '$lib/music/scale-playback';
 	import { Note } from 'tonal';
 	import * as Tone from 'tone';
 
 	type ScaleDefinition = (typeof scaleData.scales)[number];
 
-	const whiteKeys = [
-		'C3',
-		'D3',
-		'E3',
-		'F3',
-		'G3',
-		'A3',
-		'B3',
-		'C4',
-		'D4',
-		'E4',
-		'F4',
-		'G4',
-		'A4',
-		'B4'
-	];
-	const blackKeys = [
-		{ note: 'Db3', afterWhite: 0 },
-		{ note: 'Eb3', afterWhite: 1 },
-		{ note: 'Gb3', afterWhite: 3 },
-		{ note: 'Ab3', afterWhite: 4 },
-		{ note: 'Bb3', afterWhite: 5 },
-		{ note: 'Db4', afterWhite: 7 },
-		{ note: 'Eb4', afterWhite: 8 },
-		{ note: 'Gb4', afterWhite: 10 },
-		{ note: 'Ab4', afterWhite: 11 },
-		{ note: 'Bb4', afterWhite: 12 }
-	];
-
 	let selectedRoot = $state('C');
 	let selectedScaleId = $state('major');
 	let selectedVoiceId = $state('grand');
 	let selectedPlaybackStyle = $state<PlaybackStyle>('scale');
 	let tempo = $state(120);
+	let advancedSettingsOpen = $state(false);
 	let isPlaying = $state(false);
 	let synth: Tone.PolySynth | undefined;
 	let playbackTimer: ReturnType<typeof setTimeout> | undefined;
@@ -52,8 +27,6 @@
 	let scaleNotes = $derived(buildScale(selectedRoot, selectedScale.intervals));
 
 	const noteLabel = (note: string) => Note.pitchClass(note);
-	const isScaleNote = (note: string) => belongsToScale(note, scaleNotes);
-	const blackKeyLeft = (afterWhite: number) => `${((afterWhite + 1) / whiteKeys.length) * 100}%`;
 
 	function createSynth() {
 		if (selectedVoiceId === 'epiano') {
@@ -135,6 +108,7 @@
 	class="min-h-[calc(100vh-180px)] bg-gradient-to-b from-slate-950 to-slate-900 px-4 py-12 sm:px-6"
 >
 	<div class="mx-auto max-w-6xl">
+		<BackToTools />
 		<header class="mb-8 text-center">
 			<p class="mb-2 text-sm font-semibold tracking-[0.25em] text-emerald-400 uppercase">
 				See the pattern. Hear the color.
@@ -181,73 +155,96 @@
 				</div>
 			</div>
 
-			<div
-				class="mb-7 grid gap-5 rounded-xl border border-slate-700 bg-slate-900/50 p-5 lg:grid-cols-3"
+			<button
+				type="button"
+				onclick={() => (advancedSettingsOpen = !advancedSettingsOpen)}
+				aria-expanded={advancedSettingsOpen}
+				aria-controls="scale-playback-settings"
+				class="mb-5 flex w-full items-center justify-between rounded-xl border border-slate-700 bg-slate-900/60 px-5 py-4 text-left transition duration-500 hover:border-slate-500 hover:bg-slate-700/70"
 			>
-				<div>
-					<p class="mb-3 text-sm font-semibold text-white">3. Choose a sound</p>
-					<div class="grid grid-cols-2 gap-2">
-						{#each scaleData.voices as voice (voice.id)}
-							<button
-								type="button"
-								onclick={() => (selectedVoiceId = voice.id)}
-								class="rounded-lg border p-3 text-left transition {selectedVoiceId === voice.id
-									? 'border-cyan-400 bg-cyan-500/15'
-									: 'border-slate-700 bg-slate-800 hover:border-slate-500'}"
-							>
-								<span class="font-bold text-white">{voice.icon} {voice.name}</span>
-								<span class="mt-1 block text-xs text-slate-400">{voice.description}</span>
-							</button>
-						{/each}
-					</div>
-				</div>
+				<span>
+					<span class="block font-bold text-white">⚙️ Playback settings</span>
+					<span class="mt-1 block text-sm text-slate-400">Sound, play style and speed</span>
+				</span>
+				<span
+					class="text-xl text-slate-300 transition-transform duration-500 {advancedSettingsOpen
+						? 'rotate-180'
+						: ''}"
+					aria-hidden="true">⌄</span
+				>
+			</button>
 
-				<div>
-					<p class="mb-3 text-sm font-semibold text-white">4. Choose a play style</p>
-					<div class="grid grid-cols-2 gap-2">
-						{#each scaleData.playbackStyles as style (style.id)}
-							<button
-								type="button"
-								onclick={() => (selectedPlaybackStyle = style.id as PlaybackStyle)}
-								class="rounded-lg border p-3 text-left transition {selectedPlaybackStyle ===
-								style.id
-									? 'border-violet-400 bg-violet-500/15'
-									: 'border-slate-700 bg-slate-800 hover:border-slate-500'}"
-							>
-								<span class="font-bold text-white">{style.name}</span>
-								<span class="mt-1 block text-xs text-slate-400">{style.description}</span>
-							</button>
-						{/each}
+			{#if advancedSettingsOpen}
+				<div
+					id="scale-playback-settings"
+					class="mb-7 grid gap-5 rounded-xl border border-slate-700 bg-slate-900/50 p-5 lg:grid-cols-3"
+					transition:slide={{ duration: 500 }}
+				>
+					<div>
+						<p class="mb-3 text-sm font-semibold text-white">3. Choose a sound</p>
+						<div class="grid grid-cols-2 gap-2">
+							{#each scaleData.voices as voice (voice.id)}
+								<button
+									type="button"
+									onclick={() => (selectedVoiceId = voice.id)}
+									class="rounded-lg border p-3 text-left transition {selectedVoiceId === voice.id
+										? 'border-cyan-400 bg-cyan-500/15'
+										: 'border-slate-700 bg-slate-800 hover:border-slate-500'}"
+								>
+									<span class="font-bold text-white">{voice.icon} {voice.name}</span>
+									<span class="mt-1 block text-xs text-slate-400">{voice.description}</span>
+								</button>
+							{/each}
+						</div>
 					</div>
-				</div>
 
-				<div>
-					<div class="mb-3 flex items-center justify-between">
-						<p class="text-sm font-semibold text-white">5. Adjust the speed</p>
-						<span class="rounded-full bg-amber-500/15 px-3 py-1 text-sm font-bold text-amber-300">
-							{tempo} BPM
-						</span>
+					<div>
+						<p class="mb-3 text-sm font-semibold text-white">4. Choose a play style</p>
+						<div class="grid grid-cols-2 gap-2">
+							{#each scaleData.playbackStyles as style (style.id)}
+								<button
+									type="button"
+									onclick={() => (selectedPlaybackStyle = style.id as PlaybackStyle)}
+									class="rounded-lg border p-3 text-left transition {selectedPlaybackStyle ===
+									style.id
+										? 'border-violet-400 bg-violet-500/15'
+										: 'border-slate-700 bg-slate-800 hover:border-slate-500'}"
+								>
+									<span class="font-bold text-white">{style.name}</span>
+									<span class="mt-1 block text-xs text-slate-400">{style.description}</span>
+								</button>
+							{/each}
+						</div>
 					</div>
-					<input
-						type="range"
-						min="60"
-						max="240"
-						step="5"
-						value={tempo}
-						oninput={(event) => (tempo = Number(event.currentTarget.value))}
-						aria-label="Playback speed"
-						class="mt-4 h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-700 accent-amber-400"
-					/>
-					<div class="mt-3 flex justify-between text-xs text-slate-500">
-						<span>Slow · 60</span>
-						<span>Fast · 240</span>
+
+					<div>
+						<div class="mb-3 flex items-center justify-between">
+							<p class="text-sm font-semibold text-white">5. Adjust the speed</p>
+							<span class="rounded-full bg-amber-500/15 px-3 py-1 text-sm font-bold text-amber-300">
+								{tempo} BPM
+							</span>
+						</div>
+						<input
+							type="range"
+							min="60"
+							max="240"
+							step="5"
+							value={tempo}
+							oninput={(event) => (tempo = Number(event.currentTarget.value))}
+							aria-label="Playback speed"
+							class="mt-4 h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-700 accent-amber-400"
+						/>
+						<div class="mt-3 flex justify-between text-xs text-slate-500">
+							<span>Slow · 60</span>
+							<span>Fast · 240</span>
+						</div>
+						<p class="mt-5 text-sm leading-relaxed text-slate-400">
+							Start slowly enough to hear every note clearly, then raise the tempo as the pattern
+							becomes familiar.
+						</p>
 					</div>
-					<p class="mt-5 text-sm leading-relaxed text-slate-400">
-						Start slowly enough to hear every note clearly, then raise the tempo as the pattern
-						becomes familiar.
-					</p>
 				</div>
-			</div>
+			{/if}
 
 			<div
 				class="mb-5 rounded-xl border border-emerald-500/25 bg-gradient-to-br from-emerald-950/70 to-slate-900 p-5 sm:p-6"
@@ -284,35 +281,7 @@
 				</p>
 			</div>
 
-			<div class="overflow-x-auto rounded-xl bg-slate-950 p-4 sm:p-6">
-				<div class="relative h-52 min-w-[760px]" aria-label="Two octave piano keyboard">
-					<div class="flex h-full">
-						{#each whiteKeys as note (note)}
-							<div
-								class="flex flex-1 items-end justify-center rounded-b-md border border-slate-400 pb-3 text-xs font-bold {isScaleNote(
-									note
-								)
-									? 'bg-emerald-400 text-emerald-950 shadow-[inset_0_-18px_30px_rgba(16,185,129,0.25)]'
-									: 'bg-white text-slate-700'}"
-							>
-								{note}
-							</div>
-						{/each}
-					</div>
-					{#each blackKeys as key (key.note)}
-						<div
-							class="absolute top-0 z-10 flex h-[62%] w-[4.5%] -translate-x-1/2 items-end justify-center rounded-b-md border border-slate-950 pb-2 text-[10px] font-bold shadow-lg {isScaleNote(
-								key.note
-							)
-								? 'bg-emerald-600 text-white'
-								: 'bg-slate-900 text-slate-300'}"
-							style:left={blackKeyLeft(key.afterWhite)}
-						>
-							{key.note}
-						</div>
-					{/each}
-				</div>
-			</div>
+			<PianoKeyboard selectedNotes={scaleNotes} />
 
 			<div class="mt-5 flex flex-wrap items-center gap-2" aria-live="polite">
 				<span class="mr-2 text-sm font-semibold text-slate-400">Notes:</span>

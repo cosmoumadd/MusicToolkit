@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { base } from '$app/paths';
+	import PianoKeyboard from '$lib/components/music/PianoKeyboard.svelte';
+	import BackToTools from '$lib/components/tools/BackToTools.svelte';
 	import detectorData from '$lib/data/chord-detector.json';
 	import { detectChord, noteAtFret, notesForChord } from '$lib/music/chord-detector';
 	import { Note } from 'tonal';
@@ -16,8 +18,6 @@
 		detectorData.instruments.find((item) => item.id === instrumentId) as Instrument
 	);
 	let chordName = $derived(detectChord(selectedNotes));
-	let pianoNotes = $derived(Array.from({ length: 24 }, (_, index) => noteAtFret('C3', index)));
-
 	const pitchClass = (note: string) => NoteName(note);
 
 	function NoteName(note: string): string {
@@ -70,6 +70,7 @@
 	class="min-h-[calc(100vh-180px)] bg-gradient-to-b from-slate-950 to-slate-900 px-4 py-12 sm:px-6"
 >
 	<div class="mx-auto max-w-6xl">
+		<BackToTools />
 		<header class="mb-8 text-center">
 			<p class="mb-2 text-sm font-semibold tracking-[0.25em] text-violet-400 uppercase">
 				Build it. Hear it. Name it.
@@ -124,23 +125,7 @@
 
 			<div class="overflow-x-auto rounded-xl bg-slate-950 p-4">
 				{#if instrument.id === 'piano'}
-					<div class="flex min-w-[760px]" aria-label="Two octave piano keyboard">
-						{#each pianoNotes as note (note)}
-							{@const black = note.includes('#') || note.includes('b')}
-							<button
-								type="button"
-								onclick={() => toggleNote(note)}
-								aria-pressed={isSelected(note)}
-								class="h-36 min-w-12 rounded-b-md border text-xs font-bold transition {black
-									? 'z-10 -mx-3 h-24 border-slate-950 bg-slate-800 text-white'
-									: 'border-slate-400 bg-white pt-24 text-slate-800'} {isSelected(note)
-									? '!border-violet-300 !bg-violet-500 !text-white'
-									: ''}"
-							>
-								{note}
-							</button>
-						{/each}
-					</div>
+					<PianoKeyboard {selectedNotes} interactive onNoteClick={toggleNote} accent="violet" />
 				{:else}
 					<div class="min-w-[760px] space-y-2" aria-label={`${instrument.name} fretboard`}>
 						<div
