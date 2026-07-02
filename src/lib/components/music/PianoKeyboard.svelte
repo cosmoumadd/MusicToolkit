@@ -55,8 +55,8 @@
 		accent === 'violet' ? 'bg-violet-600 text-white' : 'bg-emerald-600 text-white';
 </script>
 
-<div class="overflow-x-auto rounded-xl bg-slate-950 p-4 sm:p-6">
-	<div class="relative h-52 min-w-[760px]" aria-label="Two octave piano keyboard">
+<div class="rounded-xl bg-slate-950 p-2 sm:p-6">
+	<div class="relative h-36 w-full sm:h-52" aria-label="Two octave piano keyboard">
 		<div class="flex h-full">
 			{#each whiteKeys as note (note)}
 				<button
@@ -64,7 +64,7 @@
 					disabled={!interactive}
 					onclick={() => onNoteClick?.(note)}
 					aria-pressed={interactive ? isSelected(note) : undefined}
-					class="flex flex-1 items-end justify-center rounded-b-md border border-slate-400 pb-3 text-xs font-bold transition {interactive
+					class="flex min-w-0 flex-1 items-end justify-center rounded-b-md border border-slate-400 pb-2 text-[8px] font-bold transition sm:pb-3 sm:text-xs {interactive
 						? 'cursor-pointer hover:bg-slate-100'
 						: 'cursor-default'} {isSelected(note)
 						? selectedWhiteClass()
@@ -80,7 +80,7 @@
 				disabled={!interactive}
 				onclick={() => onNoteClick?.(key.note)}
 				aria-pressed={interactive ? isSelected(key.note) : undefined}
-				class="absolute top-0 z-10 flex h-[62%] w-[4.5%] -translate-x-1/2 items-end justify-center rounded-b-md border border-slate-950 pb-2 text-[10px] font-bold shadow-lg transition {interactive
+				class="absolute top-0 z-10 flex h-[62%] w-[5%] -translate-x-1/2 items-end justify-center overflow-hidden rounded-b-md border border-slate-950 pb-1 text-[0px] font-bold shadow-lg transition sm:w-[4.5%] sm:pb-2 sm:text-[10px] {interactive
 					? 'cursor-pointer hover:bg-slate-700'
 					: 'cursor-default'} {isSelected(key.note)
 					? selectedBlackClass()

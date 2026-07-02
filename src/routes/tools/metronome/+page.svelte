@@ -66,11 +66,11 @@
 </svelte:head>
 
 <div
-	class="min-h-[calc(100vh-180px)] bg-gradient-to-b from-slate-950 to-slate-900 px-4 py-12 sm:px-6"
+	class="min-h-[calc(100vh-180px)] bg-gradient-to-b from-slate-950 to-slate-900 px-3 py-4 sm:px-6 sm:py-12"
 >
 	<div class="mx-auto max-w-3xl">
 		<BackToTools />
-		<header class="mb-8 text-center">
+		<header class="mb-3 text-center sm:mb-8">
 			<p class="mb-2 text-sm font-semibold tracking-[0.25em] text-cyan-400 uppercase">
 				Practice with precision
 			</p>
@@ -80,12 +80,14 @@
 			</p>
 		</header>
 
-		<section class="mb-6 rounded-2xl border border-slate-700 bg-slate-800 p-5 shadow-2xl sm:p-8">
+		<section
+			class="mb-3 rounded-2xl border border-slate-700 bg-slate-800 p-3 shadow-2xl sm:mb-6 sm:p-8"
+		>
 			<div class="mb-2 text-center text-sm font-semibold tracking-wider text-cyan-400 uppercase">
 				{tempoName(state.bpm)} · {state.bpm} BPM
 			</div>
 
-			<div class="my-8">
+			<div class="my-3 sm:my-8">
 				<BeatIndicator
 					beats={state.timeSignature.beats}
 					currentBeat={state.currentBeat}
@@ -95,10 +97,10 @@
 
 			<TempoControl bpm={state.bpm} onChange={handleBpmChange} onTap={handleTap} />
 
-			<div class="mt-6 flex gap-3">
+			<div class="mt-3 flex gap-2 sm:mt-6 sm:gap-3">
 				<button
 					onclick={handlePlayPause}
-					class="flex-1 rounded-xl px-6 py-4 text-lg font-bold text-white transition {state.isPlaying
+					class="flex-1 rounded-xl px-4 py-2.5 font-bold text-white transition sm:px-6 sm:py-4 sm:text-lg {state.isPlaying
 						? 'bg-rose-600 hover:bg-rose-500'
 						: 'bg-cyan-600 hover:bg-cyan-500'}"
 				>
@@ -106,17 +108,21 @@
 				</button>
 				<button
 					onclick={() => engine?.reset()}
-					class="rounded-xl bg-slate-700 px-6 py-4 font-semibold text-white transition hover:bg-slate-600"
+					class="rounded-xl bg-slate-700 px-4 py-2.5 font-semibold text-white transition hover:bg-slate-600 sm:px-6 sm:py-4"
 				>
 					Reset
 				</button>
 			</div>
-			<p class="mt-3 text-center text-xs text-slate-500">Press Space to start or stop</p>
+			<p class="mt-3 hidden text-center text-xs text-slate-500 sm:block">
+				Press Space to start or stop
+			</p>
 		</section>
 
-		<section class="mb-6 grid gap-6 md:grid-cols-2">
-			<div class="rounded-xl border border-slate-700 bg-slate-800 p-6">
-				<h2 class="mb-4 text-lg font-semibold text-white">Time Signature</h2>
+		<section class="mb-6 grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-2">
+			<div
+				class="col-span-2 rounded-xl border border-slate-700 bg-slate-800 p-3 sm:col-span-1 sm:p-6"
+			>
+				<h2 class="mb-2 text-sm font-semibold text-white sm:mb-4 sm:text-lg">Time Signature</h2>
 				<div class="grid grid-cols-5 gap-2">
 					{#each [2, 3, 4, 5, 6] as beats (beats)}
 						<button
@@ -130,17 +136,17 @@
 						</button>
 					{/each}
 				</div>
-				<p class="mt-3 text-xs text-slate-500">
+				<p class="mt-3 hidden text-xs text-slate-500 sm:block">
 					Your selection stays set when the metronome stops.
 				</p>
 			</div>
 
-			<div class="rounded-xl border border-slate-700 bg-slate-800 p-6">
-				<div class="mb-4 flex items-center justify-between">
-					<h2 class="text-lg font-semibold text-white">Volume</h2>
+			<div class="rounded-xl border border-slate-700 bg-slate-800 p-3 sm:p-6">
+				<div class="mb-2 flex items-center justify-between sm:mb-4">
+					<h2 class="text-sm font-semibold text-white sm:text-lg">Volume</h2>
 					<span class="text-sm text-slate-400">{Math.round(state.volume * 100)}%</span>
 				</div>
-				<div class="flex items-center gap-4">
+				<div class="flex items-center gap-2 sm:gap-4">
 					<span aria-hidden="true">🔈</span>
 					<input
 						type="range"
@@ -156,11 +162,11 @@
 				</div>
 			</div>
 
-			<div class="rounded-xl border border-slate-700 bg-slate-800 p-6 md:col-span-2">
+			<div class="rounded-xl border border-slate-700 bg-slate-800 p-3 sm:p-6 md:col-span-2">
 				<button
 					onclick={() => engine?.toggleAccent()}
 					aria-pressed={state.accentEnabled}
-					class="w-full rounded-lg px-4 py-3 font-semibold transition {state.accentEnabled
+					class="w-full rounded-lg px-2 py-2 text-sm font-semibold transition sm:px-4 sm:py-3 sm:text-base {state.accentEnabled
 						? 'bg-emerald-600 text-white hover:bg-emerald-500'
 						: 'bg-slate-700 text-slate-300 hover:bg-slate-600'}"
 				>

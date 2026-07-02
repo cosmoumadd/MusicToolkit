@@ -12,7 +12,7 @@
 		<div class="grid gap-6 md:grid-cols-2">
 			<a
 				href="{base}/learn/chords"
-				class="rounded-lg border border-slate-700 bg-slate-800 p-6 transition-all duration-1000 hover:scale-105 hover:border-rose-500 [&_h2]:transition-colors [&_h2]:duration-1000 hover:[&_h2]:text-rose-300"
+				class="rounded-lg border border-slate-700 bg-slate-800 p-6 transition-all duration-500 hover:scale-105 hover:border-rose-500 [&_h2]:transition-colors [&_h2]:duration-500 hover:[&_h2]:text-rose-300"
 			>
 				<h2 class="mb-2 text-2xl font-bold text-white">🎸 Chords</h2>
 				<p class="text-slate-400">Learn chord construction, voicings, and progressions.</p>
@@ -20,7 +20,7 @@
 
 			<a
 				href="{base}/learn/scales"
-				class="rounded-lg border border-slate-700 bg-slate-800 p-6 transition-all duration-1000 hover:scale-105 hover:border-emerald-500 [&_h2]:transition-colors [&_h2]:duration-1000 hover:[&_h2]:text-emerald-300"
+				class="rounded-lg border border-slate-700 bg-slate-800 p-6 transition-all duration-500 hover:scale-105 hover:border-emerald-500 [&_h2]:transition-colors [&_h2]:duration-500 hover:[&_h2]:text-emerald-300"
 			>
 				<h2 class="mb-2 text-2xl font-bold text-white">🎵 Scales</h2>
 				<p class="text-slate-400">Master major, minor, pentatonic, and many more scales.</p>
@@ -28,7 +28,7 @@
 
 			<a
 				href="{base}/learn/intervals"
-				class="rounded-lg border border-slate-700 bg-slate-800 p-6 transition-all duration-1000 hover:scale-105 hover:border-sky-500 [&_h2]:transition-colors [&_h2]:duration-1000 hover:[&_h2]:text-sky-300"
+				class="rounded-lg border border-slate-700 bg-slate-800 p-6 transition-all duration-500 hover:scale-105 hover:border-sky-500 [&_h2]:transition-colors [&_h2]:duration-500 hover:[&_h2]:text-sky-300"
 			>
 				<h2 class="mb-2 text-2xl font-bold text-white">🎼 Intervals</h2>
 				<p class="text-slate-400">

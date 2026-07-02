@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import { base } from '$app/paths';
 	import PianoKeyboard from '$lib/components/music/PianoKeyboard.svelte';
 	import BackToTools from '$lib/components/tools/BackToTools.svelte';
 	import detectorData from '$lib/data/chord-detector.json';
 	import { detectChord, noteAtFret, notesForChord } from '$lib/music/chord-detector';
 	import { Note } from 'tonal';
+	import * as Tone from 'tone';
 
 	type Instrument = (typeof detectorData.instruments)[number];
 	type Quality = (typeof detectorData.qualities)[number];
@@ -13,6 +15,7 @@
 	let selectedNotes = $state<string[]>([]);
 	let selectedRoot = $state('C');
 	let selectedQuality = $state('major');
+	let synth: Tone.PolySynth | undefined;
 
 	let instrument = $derived(
 		detectorData.instruments.find((item) => item.id === instrumentId) as Instrument
@@ -56,6 +59,20 @@
 		selectedRoot = 'C';
 		selectedQuality = 'major';
 	}
+
+	async function playChord() {
+		if (!selectedNotes.length) return;
+		await Tone.start();
+		synth ??= new Tone.PolySynth(Tone.Synth, {
+			volume: -9,
+			oscillator: { type: 'triangle8' },
+			envelope: { attack: 0.005, decay: 0.5, sustain: 0.2, release: 1 }
+		}).toDestination();
+		const notes = [...new Set(selectedNotes.map((note) => `${Note.pitchClass(note)}3`))];
+		synth.triggerAttackRelease(notes, '2n');
+	}
+
+	onDestroy(() => synth?.dispose());
 </script>
 
 <svelte:head>
@@ -92,29 +109,42 @@
 							: 'Select at least two notes to begin'}
 					</p>
 				</div>
-				<button
-					type="button"
-					onclick={reset}
-					class="rounded-xl border border-slate-600 bg-slate-700 px-5 py-3 font-semibold text-white transition hover:bg-slate-600"
-				>
-					↺ Reset
-				</button>
+				<div class="flex gap-2">
+					<button
+						type="button"
+						onclick={playChord}
+						disabled={!selectedNotes.length}
+						class="rounded-xl bg-violet-600 px-5 py-3 font-semibold text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"
+					>
+						Play chord
+					</button>
+					<button
+						type="button"
+						onclick={reset}
+						class="rounded-xl border border-slate-600 bg-slate-700 px-5 py-3 font-semibold text-white transition hover:bg-slate-600"
+					>
+						Reset
+					</button>
+				</div>
 			</div>
 
-			<div class="mb-7">
+			<div class="mb-5 sm:mb-7">
 				<p class="mb-3 text-sm font-semibold text-white">Display instrument</p>
-				<div class="grid gap-3 sm:grid-cols-3">
+				<div
+					class="flex [scrollbar-width:none] gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-3 sm:gap-3 [&::-webkit-scrollbar]:hidden"
+				>
 					{#each detectorData.instruments as item (item.id)}
 						<button
 							type="button"
 							onclick={() => changeInstrument(item.id)}
-							class="rounded-xl border p-4 text-left transition {instrumentId === item.id
+							class="min-w-fit rounded-xl border px-4 py-3 text-left transition sm:min-w-0 sm:p-4 {instrumentId ===
+							item.id
 								? 'border-violet-400 bg-violet-500/15'
 								: 'border-slate-700 bg-slate-900/50 hover:border-slate-500'}"
 						>
 							<span class="text-2xl" aria-hidden="true">{item.icon}</span>
 							<span class="ml-2 font-bold text-white">{item.name}</span>
-							<span class="mt-1 block text-xs text-slate-400">{item.description}</span>
+							<span class="mt-1 hidden text-xs text-slate-400 sm:block">{item.description}</span>
 						</button>
 					{/each}
 				</div>
@@ -123,13 +153,16 @@
 				</p>
 			</div>
 
-			<div class="overflow-x-auto rounded-xl bg-slate-950 p-4">
+			<div class="rounded-xl bg-slate-950 p-2 sm:p-4">
 				{#if instrument.id === 'piano'}
 					<PianoKeyboard {selectedNotes} interactive onNoteClick={toggleNote} accent="violet" />
 				{:else}
-					<div class="min-w-[760px] space-y-2" aria-label={`${instrument.name} fretboard`}>
+					<div
+						class="space-y-1 overflow-x-auto sm:space-y-2"
+						aria-label={`${instrument.name} fretboard`}
+					>
 						<div
-							class="grid grid-cols-[48px_repeat(13,minmax(46px,1fr))] text-center text-xs text-slate-500"
+							class="grid min-w-[520px] grid-cols-[34px_repeat(13,minmax(0,1fr))] text-center text-[9px] text-slate-500 sm:min-w-[760px] sm:grid-cols-[48px_repeat(13,minmax(46px,1fr))] sm:text-xs"
 						>
 							<span>String</span>
 							{#each Array.from({ length: 13 }, (_, fret) => fret as number) as fret}
@@ -137,7 +170,9 @@
 							{/each}
 						</div>
 						{#each instrument.strings ?? [] as openNote (openNote)}
-							<div class="grid grid-cols-[48px_repeat(13,minmax(46px,1fr))] items-center">
+							<div
+								class="grid min-w-[520px] grid-cols-[34px_repeat(13,minmax(0,1fr))] items-center sm:min-w-[760px] sm:grid-cols-[48px_repeat(13,minmax(46px,1fr))]"
+							>
 								<span class="text-center text-xs font-bold text-slate-300">{openNote}</span>
 								{#each Array.from({ length: 13 }, (_, fret) => fret as number) as fret}
 									{@const note = noteAtFret(openNote, fret)}
@@ -145,7 +180,7 @@
 										type="button"
 										onclick={() => toggleNote(note)}
 										aria-pressed={isSelected(note)}
-										class="h-10 border-y border-r border-amber-900/70 text-xs font-semibold transition {isSelected(
+										class="h-8 overflow-hidden border-y border-r border-amber-900/70 text-[9px] font-semibold transition sm:h-10 sm:text-xs {isSelected(
 											note
 										)
 											? 'bg-violet-500 text-white'
