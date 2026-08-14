@@ -38,6 +38,12 @@ coverage
 
 # Local agent configuration
 .agents
+!.agents/
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/music-toolkit-guidelines/
+!.agents/skills/music-toolkit-guidelines/**
 /.claude-plugin
 
 # Editors

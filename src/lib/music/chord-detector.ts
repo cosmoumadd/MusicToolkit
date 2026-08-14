@@ -2,6 +2,8 @@ import { Chord, Note } from 'tonal';
 
 export const pitchClasses = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
+export type ChordPlaybackStyle = 'together' | 'arpeggio-then-chord';
+
 const chromaticSharps = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const chromaticFlats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
@@ -25,4 +27,24 @@ export function detectChord(notes: string[]): string {
 	if (!match) return 'Unknown';
 
 	return match.endsWith('M') ? match.slice(0, -1) : match;
+}
+
+export function buildChordVoicing(notes: string[], octave = 3): string[] {
+	const uniqueNotes = notes.filter(
+		(note, index) => notes.findIndex((item) => Note.chroma(item) === Note.chroma(note)) === index
+	);
+	const rootChroma = Note.chroma(uniqueNotes[0]);
+	if (rootChroma === undefined) return [];
+
+	return uniqueNotes
+		.map((note) => ({ note: Note.pitchClass(note), chroma: Note.chroma(note) }))
+		.filter((item): item is { note: string; chroma: number } => item.chroma !== undefined)
+		.sort((a, b) => ((a.chroma - rootChroma + 12) % 12) - ((b.chroma - rootChroma + 12) % 12))
+		.map(({ note, chroma }) => `${note}${octave + (chroma < rootChroma ? 1 : 0)}`);
+}
+
+export function createChordPlaybackEvents(notes: string[], style: ChordPlaybackStyle): string[][] {
+	if (!notes.length) return [];
+	if (style === 'arpeggio-then-chord') return [...notes.map((note) => [note]), notes];
+	return [notes];
 }

@@ -1,10 +1,17 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onDestroy, tick } from 'svelte';
 	import { base } from '$app/paths';
 	import PianoKeyboard from '$lib/components/music/PianoKeyboard.svelte';
 	import BackToTools from '$lib/components/tools/BackToTools.svelte';
 	import detectorData from '$lib/data/chord-detector.json';
-	import { detectChord, noteAtFret, notesForChord } from '$lib/music/chord-detector';
+	import {
+		buildChordVoicing,
+		createChordPlaybackEvents,
+		detectChord,
+		noteAtFret,
+		notesForChord,
+		type ChordPlaybackStyle
+	} from '$lib/music/chord-detector';
 	import { Note } from 'tonal';
 	import * as Tone from 'tone';
 
@@ -15,7 +22,20 @@
 	let selectedNotes = $state<string[]>([]);
 	let selectedRoot = $state('C');
 	let selectedQuality = $state('major');
+	let playbackInstrument = $state('piano');
+	let playbackStyle = $state<ChordPlaybackStyle>('together');
+	let settingsOpen = $state(false);
+	let isPlaying = $state(false);
 	let synth: Tone.PolySynth | undefined;
+	let playbackTimer: ReturnType<typeof setTimeout> | undefined;
+	let settingsDialog = $state<HTMLDialogElement>();
+
+	const playbackInstruments = [
+		{ id: 'piano', name: 'Piano' },
+		{ id: 'guitar', name: 'Guitar' },
+		{ id: 'strings', name: 'Strings' },
+		{ id: 'organ', name: 'Organ' }
+	];
 
 	let instrument = $derived(
 		detectorData.instruments.find((item) => item.id === instrumentId) as Instrument
@@ -52,27 +72,107 @@
 	function changeInstrument(id: string) {
 		instrumentId = id;
 		selectedNotes = [];
+		stopPlayback();
 	}
 
 	function reset() {
 		selectedNotes = [];
 		selectedRoot = 'C';
 		selectedQuality = 'major';
+		stopPlayback();
+	}
+
+	function stopPlayback() {
+		if (playbackTimer) clearTimeout(playbackTimer);
+		playbackTimer = undefined;
+		isPlaying = false;
+		synth?.releaseAll();
+		synth?.dispose();
+		synth = undefined;
+	}
+
+	function createSynth() {
+		if (playbackInstrument === 'guitar') {
+			return new Tone.PolySynth(Tone.Synth, {
+				volume: -8,
+				oscillator: { type: 'triangle' },
+				envelope: { attack: 0.002, decay: 0.35, sustain: 0.08, release: 0.4 }
+			}).toDestination();
+		}
+
+		if (playbackInstrument === 'strings') {
+			return new Tone.PolySynth(Tone.Synth, {
+				volume: -12,
+				oscillator: { type: 'sawtooth' },
+				envelope: { attack: 0.35, decay: 0.4, sustain: 0.65, release: 1.5 }
+			}).toDestination();
+		}
+
+		if (playbackInstrument === 'organ') {
+			return new Tone.PolySynth(Tone.Synth, {
+				volume: -11,
+				oscillator: { type: 'sine4' },
+				envelope: { attack: 0.03, decay: 0.15, sustain: 0.8, release: 0.6 }
+			}).toDestination();
+		}
+
+		return new Tone.PolySynth(Tone.Synth, {
+			volume: -9,
+			oscillator: { type: 'triangle8' },
+			envelope: { attack: 0.005, decay: 0.5, sustain: 0.2, release: 1 }
+		}).toDestination();
+	}
+
+	function changePlaybackInstrument(id: string) {
+		playbackInstrument = id;
+		stopPlayback();
+	}
+
+	async function openSettings() {
+		if (settingsOpen) return;
+		settingsOpen = true;
+		await tick();
+		settingsDialog?.showModal();
+	}
+
+	function closeSettings() {
+		settingsDialog?.close();
+	}
+
+	function closeFromBackdrop(event: MouseEvent) {
+		if (event.target === settingsDialog) closeSettings();
+	}
+
+	function closeFromKeyboard(event: KeyboardEvent) {
+		if (settingsOpen && event.key === 'Escape') {
+			event.preventDefault();
+			closeSettings();
+		}
 	}
 
 	async function playChord() {
 		if (!selectedNotes.length) return;
 		await Tone.start();
-		synth ??= new Tone.PolySynth(Tone.Synth, {
-			volume: -9,
-			oscillator: { type: 'triangle8' },
-			envelope: { attack: 0.005, decay: 0.5, sustain: 0.2, release: 1 }
-		}).toDestination();
-		const notes = [...new Set(selectedNotes.map((note) => `${Note.pitchClass(note)}3`))];
-		synth.triggerAttackRelease(notes, '2n');
+		stopPlayback();
+		synth = createSynth();
+		const notes = buildChordVoicing(selectedNotes);
+		const events = createChordPlaybackEvents(notes, playbackStyle);
+		const stepDuration = playbackStyle === 'together' ? 0 : 0.42;
+		const start = Tone.now() + 0.05;
+		isPlaying = true;
+		events.forEach((eventNotes, index) => {
+			const isFinalChord = playbackStyle === 'together' || index === events.length - 1;
+			synth?.triggerAttackRelease(
+				eventNotes,
+				isFinalChord ? 1.5 : 0.32,
+				start + index * stepDuration
+			);
+		});
+		const playbackLength = (events.length - 1) * stepDuration + 1.55;
+		playbackTimer = setTimeout(() => (isPlaying = false), playbackLength * 1000);
 	}
 
-	onDestroy(() => synth?.dispose());
+	onDestroy(stopPlayback);
 </script>
 
 <svelte:head>
@@ -109,15 +209,7 @@
 							: 'Select at least two notes to begin'}
 					</p>
 				</div>
-				<div class="flex gap-2">
-					<button
-						type="button"
-						onclick={playChord}
-						disabled={!selectedNotes.length}
-						class="rounded-xl bg-violet-600 px-5 py-3 font-semibold text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"
-					>
-						Play chord
-					</button>
+				<div class="flex flex-col items-stretch gap-2 sm:items-end">
 					<button
 						type="button"
 						onclick={reset}
@@ -125,8 +217,122 @@
 					>
 						Reset
 					</button>
+					<div class="flex gap-2">
+						<button
+							type="button"
+							onclick={openSettings}
+							aria-label="Chord playback settings"
+							aria-expanded={settingsOpen}
+							aria-haspopup="dialog"
+							class="rounded-xl border border-slate-600 bg-slate-700 px-4 py-3 text-xl leading-none text-white transition hover:bg-slate-600"
+						>
+							<span aria-hidden="true">⚙</span>
+						</button>
+						<button
+							type="button"
+							onclick={playChord}
+							disabled={!selectedNotes.length || isPlaying}
+							class="flex-1 rounded-xl bg-violet-600 px-5 py-3 font-semibold whitespace-nowrap text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"
+						>
+							{isPlaying ? 'Playing…' : '▶ Play chord'}
+						</button>
+					</div>
 				</div>
 			</div>
+
+			{#if settingsOpen}
+				<dialog
+					bind:this={settingsDialog}
+					onclose={() => (settingsOpen = false)}
+					onclick={closeFromBackdrop}
+					onkeydown={closeFromKeyboard}
+					aria-labelledby="playback-settings-title"
+					class="m-auto max-h-[calc(100vh-2rem)] w-[min(30rem,calc(100vw-2rem))] overflow-y-auto rounded-2xl border border-slate-600 bg-slate-900 p-0 text-left text-slate-200 shadow-2xl backdrop:bg-slate-950/75 backdrop:backdrop-blur-sm"
+				>
+					<header class="flex items-center justify-between border-b border-slate-700 px-5 py-4">
+						<div>
+							<p class="text-xs font-bold tracking-widest text-violet-400 uppercase">Play chord</p>
+							<h2 id="playback-settings-title" class="mt-1 text-xl font-black text-white">
+								Playback settings
+							</h2>
+						</div>
+						<button
+							type="button"
+							onclick={closeSettings}
+							aria-label="Close playback settings"
+							class="rounded-lg px-3 py-2 text-2xl leading-none text-slate-400 transition hover:bg-slate-800 hover:text-white"
+						>
+							<span aria-hidden="true">×</span>
+						</button>
+					</header>
+
+					<div class="p-5">
+						<fieldset>
+							<legend class="mb-3 text-sm font-bold text-white">Sound</legend>
+							<div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+								{#each playbackInstruments as voice (voice.id)}
+									<button
+										type="button"
+										onclick={() => changePlaybackInstrument(voice.id)}
+										aria-pressed={playbackInstrument === voice.id}
+										class="rounded-lg border px-3 py-2 text-sm font-semibold transition {playbackInstrument ===
+										voice.id
+											? 'border-violet-400 bg-violet-500/15 text-white'
+											: 'border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-500'}"
+									>
+										{voice.name}
+									</button>
+								{/each}
+							</div>
+						</fieldset>
+
+						<fieldset class="mt-5 border-t border-slate-700 pt-5">
+							<legend class="mb-2 text-sm font-bold text-white">Playback</legend>
+							<label class="flex cursor-pointer gap-3 rounded-lg p-3 hover:bg-slate-800">
+								<input
+									type="radio"
+									name="playback-style"
+									value="together"
+									checked={playbackStyle === 'together'}
+									onchange={() => (playbackStyle = 'together')}
+									class="mt-1 accent-violet-500"
+								/>
+								<span
+									><strong class="block text-sm text-white">Together</strong><span
+										class="text-xs text-slate-400">Play all chord notes at once.</span
+									></span
+								>
+							</label>
+							<label class="mt-1 flex cursor-pointer gap-3 rounded-lg p-3 hover:bg-slate-800">
+								<input
+									type="radio"
+									name="playback-style"
+									value="arpeggio-then-chord"
+									checked={playbackStyle === 'arpeggio-then-chord'}
+									onchange={() => (playbackStyle = 'arpeggio-then-chord')}
+									class="mt-1 accent-violet-500"
+								/>
+								<span
+									><strong class="block text-sm text-white">One by one, then together</strong><span
+										class="text-xs text-slate-400">Hear each note before the full chord.</span
+									></span
+								>
+							</label>
+							<p class="mt-2 text-xs text-slate-500">Notes are voiced within one octave.</p>
+						</fieldset>
+					</div>
+
+					<footer class="flex justify-end border-t border-slate-700 px-5 py-4">
+						<button
+							type="button"
+							onclick={closeSettings}
+							class="rounded-lg bg-violet-600 px-5 py-2.5 font-bold text-white transition hover:bg-violet-500"
+						>
+							Done
+						</button>
+					</footer>
+				</dialog>
+			{/if}
 
 			<div class="mb-5 sm:mb-7">
 				<p class="mb-3 text-sm font-semibold text-white">Display instrument</p>

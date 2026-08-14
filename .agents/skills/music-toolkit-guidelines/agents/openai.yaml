@@ -1,0 +1,4 @@
+interface:
+  display_name: "Music Toolkit Guidelines"
+  short_description: "Build reliable, learner-friendly music tools"
+  default_prompt: "Use $music-toolkit-guidelines to implement or review a focused MusicToolkit change."
