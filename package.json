@@ -2,6 +2,7 @@
 	"name": "musictoolkit",
 	"private": true,
 	"version": "0.0.1",
+	"packageManager": "npm@11.6.2",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",

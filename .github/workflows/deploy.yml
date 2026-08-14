@@ -14,10 +14,15 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  NODE_VERSION: 24.12.0
+  NPM_VERSION: 11.6.2
+
 jobs:
   build:
-    name: Build
+    name: Test and build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -25,8 +30,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
+          cache-dependency-path: package-lock.json
+
+      # Keep npm aligned with the version that generated package-lock.json.
+      # Older bundled npm versions can reject optional WASM dependencies in this lockfile.
+      - name: Setup npm
+        run: npm install --global npm@${NPM_VERSION}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -52,6 +63,7 @@ jobs:
     name: Deploy
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
