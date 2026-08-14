@@ -14,10 +14,6 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
-env:
-  NODE_VERSION: 24.12.0
-  NPM_VERSION: 11.6.2
-
 jobs:
   build:
     name: Test and build
@@ -30,14 +26,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: package-lock.json
 
-      # Keep npm aligned with the version that generated package-lock.json.
-      # Older bundled npm versions can reject optional WASM dependencies in this lockfile.
+      # package.json#packageManager is the npm version used to generate the lockfile.
       - name: Setup npm
-        run: npm install --global npm@${NPM_VERSION}
+        run: npm install --global "$(node --print 'require("./package.json").packageManager')"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

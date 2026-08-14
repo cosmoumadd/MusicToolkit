@@ -31,6 +31,17 @@ Use the existing boundaries before adding new ones:
 
 Inspect nearby code and tests before choosing an implementation pattern. Match existing Svelte 5 runes, TypeScript, Tailwind utilities, naming, and formatting.
 
+## Preserve the Runtime and Deployment Contract
+
+- Treat `.nvmrc` as the source of truth for the CI and recommended local Node.js version.
+- Treat `package.json#packageManager` as the source of truth for npm. Use that exact npm version whenever changing dependencies or `package-lock.json`.
+- Make workflows consume those sources instead of copying runtime versions into YAML. Document supported alternatives and upgrade decisions in `docs/deployment.md`.
+- Keep GitHub Pages on the Actions deployment model: test and build first, upload only the generated `build/` directory, then deploy through the `github-pages` environment.
+- Keep `npm ci` in CI. If it reports a lockfile mismatch, align Node.js and npm before regenerating the lockfile; do not hide the mismatch with a non-reproducible install step.
+- Preserve the GitHub Pages base-path behavior when changing SvelteKit, adapters, routes, assets, or internal links.
+- Update GitHub Action major versions deliberately and verify one complete Pages run. Treat an action deprecation warning separately from a failing exit status.
+- When changing a supported runtime or deployment action, update `docs/deployment.md` in the same change and run unit tests, `npm run check`, and `npm run build`.
+
 ## Work Deliberately
 
 Before editing:

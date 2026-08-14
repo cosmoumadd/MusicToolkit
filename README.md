@@ -1,45 +1,40 @@
-# sv
+# MusicToolkit
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+MusicToolkit is a browser-based music-learning companion built with SvelteKit. It combines practical tools, short theory references, and ear-training games so learners can connect notation, sound, and interaction.
 
-# Page
-The website UML is: [Music Tool Kit](cosmoumadd.github.io//MusicToolkit)
+Live site: [cosmoumadd.github.io/MusicToolkit](https://cosmoumadd.github.io/MusicToolkit/)
 
-## Creating a project
+## Development
 
-If you're seeing this, you've probably already done this step. Congrats!
+The reproducible toolchain is:
 
-```sh
-# create a new project
-npx sv create my-app
-```
+- Node.js: read from [`.nvmrc`](.nvmrc)
+- npm: read from `packageManager` in [`package.json`](package.json)
 
-To recreate this project with the same configuration:
+Use these pinned versions when installing or changing dependencies. Developers may test another supported Node.js LTS release without changing the repository pins; see [Deployment and version policy](docs/deployment.md) for the compatibility guidance and upgrade checklist.
 
 ```sh
-# recreate this project
-npx sv@0.15.3 create --template minimal --types ts --add eslint prettier tailwindcss="plugins:typography,forms" vitest="usages:component,unit" playwright --install npm .
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
+nvm install
+nvm use
+npm install --global "$(node --print 'require("./package.json").packageManager')"
+npm ci
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+If your version manager does not read `.nvmrc`, install the version written in that file manually.
 
-To create a production version of your app:
+## Quality checks
 
 ```sh
+npm run test:unit -- --run
+npm run check
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+The production build is written to `build/`. Internal links must continue to work under the `/MusicToolkit` GitHub Pages base path.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Deployment
+
+Pushes to `main` are tested, built, and deployed through GitHub Actions. Repository Settings → Pages → Build and deployment must use **GitHub Actions** as its source.
+
+See [Deployment and version policy](docs/deployment.md) for the workflow stages, pinned action versions, troubleshooting, and safe dependency/runtime upgrades.
